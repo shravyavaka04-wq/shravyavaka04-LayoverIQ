@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LayoverIQ — Smart decisions between flights.</title>
+  
+  <!-- Google Fonts & Tailwind CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-[#0A0F1D] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <nav class="sticky top-0 z-40 glass-nav border-b border-slate-800/80 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand & Tagline -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-xl shadow-lg shadow-blue-500/20">
+          ✈️
+        </div>
+        <div>
+          <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-1.5">
+            Layover<span class="text-blue-400">IQ</span>
+            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-900/60 text-blue-300 border border-blue-600/40 uppercase">v1.0</span>
+          </h1>
+          <p class="text-[11px] text-slate-400 font-medium">"Smart decisions between flights."</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="hidden md:flex items-center gap-1 bg-slate-900/90 border border-slate-800 rounded-xl p-1 text-xs">
+        <button id="tabBtn_optimizerTab" onclick="window.app.switchTab('optimizerTab')" class="px-3.5 py-1.5 rounded-lg font-bold bg-blue-600 text-white transition">
+          🧭 Layover Optimizer
+        </button>
+        <button id="tabBtn_newHereTab" onclick="window.app.switchTab('newHereTab')" class="px-3.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition">
+          🔰 "I'm New Here" Mode
+        </button>
+        <button id="tabBtn_devopsTab" onclick="window.app.switchTab('devopsTab')" class="px-3.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-200 transition flex items-center gap-1">
+          <span>🚀</span> DevOps CI/CD Lab
+        </button>
+      </div>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-3">
+        <button onclick="window.app.openSavedTripsModal()" class="px-3 py-1.5 text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+          <span>📇</span> Saved Trips
+        </button>
+
+        <div id="navUserContainer">
+          <!-- Populated by auth.js -->
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================= HERO & DEMO PRESETS ================= -->
+  <header class="hero-glow py-8 px-4 border-b border-slate-800/60">
+    <div class="max-w-7xl mx-auto text-center space-y-3">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/70 border border-blue-600/40 text-blue-300 text-xs font-bold uppercase tracking-wider">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        Flight-Safety & Layover Optimization Engine
+      </div>
+      
+      <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight max-w-3xl mx-auto">
+        What can you safely explore <br class="hidden sm:block"/>
+        <span class="bg-gradient-to-r from-blue-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">without missing your next flight?</span>
+      </h2>
+      
+      <p class="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+        Google Maps answers <em>"How to get from A to B"</em>. <strong>LayoverIQ</strong> calculates your immigration buffers, transit times, and deadlines so you never miss a connecting flight.
+      </p>
+
+      <!-- Quick Demo Presentation Presets -->
+      <div class="pt-2 flex flex-wrap items-center justify-center gap-2 text-xs">
+        <span class="text-slate-400 font-semibold text-[11px] mr-1">Demo Scenarios:</span>
+        <button onclick="window.calculatorUI.loadPreset('dubai_demo')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 transition flex items-center gap-1">
+          🇦🇪 <strong>Dubai (8.5h)</strong> Demo Case
+        </button>
+        <button onclick="window.calculatorUI.loadPreset('singapore_demo')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/30 transition flex items-center gap-1">
+          🇸🇬 <strong>Singapore (6h)</strong> Jewel & Bay
+        </button>
+        <button onclick="window.calculatorUI.loadPreset('london_demo')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-blue-300 border border-blue-500/30 transition flex items-center gap-1">
+          🇬🇧 <strong>London (7h)</strong> Museum & Big Ben
+        </button>
+        <button onclick="window.calculatorUI.loadPreset('delhi_demo')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 transition flex items-center gap-1">
+          🇮🇳 <strong>Delhi (6h)</strong> Qutub & CP
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT CONTAINER ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+
+    <!-- ================= TAB 1: LAYOVER OPTIMIZER ================= -->
+    <section id="tabPane_optimizerTab" class="space-y-6">
+
+      <!-- Layover Parameters Input Form Card -->
+      <div class="glass-card p-6 border-slate-700/80 shadow-2xl">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>🛬</span> Layover Details & Travel Preferences
+          </h3>
+          <span class="text-xs text-slate-400">Step 1: Define Flight Parameters</span>
+        </div>
+
+        <form id="layoverForm" class="space-y-5">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- Airport Selection -->
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1.5">Connecting Airport</label>
+              <select id="airportSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-semibold focus:outline-none focus:border-blue-500 transition">
+                <!-- Populated via calculatorUI.js -->
+              </select>
+            </div>
+
+            <!-- Arrival Date/Time -->
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1.5">Flight Arrival Time</label>
+              <input type="datetime-local" id="arrivalTimeInput" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition" />
+            </div>
+
+            <!-- Departure Date/Time -->
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1.5">Next Flight Departure Time</label>
+              <input type="datetime-local" id="departureTimeInput" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition" />
+            </div>
+          </div>
+
+          <!-- Secondary Parameters: Transport, Budget, Luggage -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1.5">Preferred Transport</label>
+              <select id="transportModeSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                <option value="metro" selected>🚇 Public Metro / Train (Fast & Reliable)</option>
+                <option value="taxi">🚕 Taxi / Cab (Express Direct)</option>
+                <option value="bus">🚌 Public Bus (Budget Friendly)</option>
+                <option value="walking">🚶 Walking (Nearby Only)</option>
+                <option value="any">🔀 Any Optimal Mode</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1.5">Travelers Count</label>
+              <select id="travelersCountSelect" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                <option value="1" selected>1 Traveler (Solo)</option>
+                <option value="2">2 Travelers (Couple/Pair)</option>
+                <option value="3">3-4 Travelers (Family/Group)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1.5">Budget Allocation (INR / ₹)</label>
+              <input type="number" id="budgetInput" value="3000" min="500" step="500" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" />
+            </div>
+
+            <div class="flex items-center h-full pt-4">
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="hasCheckedLuggageInput" class="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700 focus:ring-blue-500" />
+                <span class="text-xs font-semibold text-slate-300">🧳 Checked Luggage (Add Re-check buffer)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Airport Transit Visa Notice -->
+          <div id="airportTransitNotice"></div>
+
+          <!-- Interest Tags Selector -->
+          <div class="pt-1">
+            <label class="block text-xs font-bold text-slate-300 mb-2">What are you interested in experiencing?</label>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <button type="button" id="interest_landmarks" onclick="window.calculatorUI.toggleInterest('landmarks')" class="px-3 py-1.5 rounded-lg border bg-blue-600 text-white border-blue-500 font-semibold transition">🏛️ Famous Landmarks</button>
+              <button type="button" id="interest_food" onclick="window.calculatorUI.toggleInterest('food')" class="px-3 py-1.5 rounded-lg border bg-blue-600 text-white border-blue-500 font-semibold transition">🍜 Local Food & Dining</button>
+              <button type="button" id="interest_shopping" onclick="window.calculatorUI.toggleInterest('shopping')" class="px-3 py-1.5 rounded-lg border bg-slate-800/80 text-slate-300 border-slate-700 font-semibold transition">🛍️ Shopping & Malls</button>
+              <button type="button" id="interest_museums" onclick="window.calculatorUI.toggleInterest('museums')" class="px-3 py-1.5 rounded-lg border bg-slate-800/80 text-slate-300 border-slate-700 font-semibold transition">🖼️ Museums & Art</button>
+              <button type="button" id="interest_culture" onclick="window.calculatorUI.toggleInterest('culture')" class="px-3 py-1.5 rounded-lg border bg-slate-800/80 text-slate-300 border-slate-700 font-semibold transition">🕌 Culture & Heritage</button>
+              <button type="button" id="interest_nature" onclick="window.calculatorUI.toggleInterest('nature')" class="px-3 py-1.5 rounded-lg border bg-slate-800/80 text-slate-300 border-slate-700 font-semibold transition">🌿 Nature & Gardens</button>
+              <button type="button" id="interest_photography" onclick="window.calculatorUI.toggleInterest('photography')" class="px-3 py-1.5 rounded-lg border bg-blue-600 text-white border-blue-500 font-semibold transition">📸 Photography Spots</button>
+              <button type="button" id="interest_relaxation" onclick="window.calculatorUI.toggleInterest('relaxation')" class="px-3 py-1.5 rounded-lg border bg-slate-800/80 text-slate-300 border-slate-700 font-semibold transition">☕ Relaxation & Cafes</button>
+              <button type="button" id="interest_adventure" onclick="window.calculatorUI.toggleInterest('adventure')" class="px-3 py-1.5 rounded-lg border bg-slate-800/80 text-slate-300 border-slate-700 font-semibold transition">🧗 Adventure & Skywalks</button>
+            </div>
+          </div>
+
+          <!-- Mandatory Transit Visa Warning Disclaimer -->
+          <div id="visaCheckboxContainer" class="p-3.5 bg-amber-950/30 border border-amber-500/40 rounded-xl text-xs text-amber-200">
+            <p class="font-bold text-amber-300 mb-1 flex items-center gap-1.5">
+              <span>⚠️</span> Mandatory Immigration & Transit Disclaimer:
+            </p>
+            <p class="text-slate-300 text-[11px] leading-relaxed mb-2">
+              Leaving the airport during a layover may require appropriate immigration permission, visa eligibility, and sufficient time. Always verify current official government and airline entry requirements.
+            </p>
+            <label class="flex items-center gap-2 cursor-pointer font-bold text-white">
+              <input type="checkbox" id="visaCheckbox" checked class="w-4 h-4 rounded text-blue-600 bg-slate-900 border-slate-700" />
+              <span>I understand that I must verify entry/transit requirements before leaving the airport.</span>
+            </label>
+          </div>
+
+          <!-- Action Button -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <button type="submit" id="generateBtn" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-500 hover:to-teal-400 text-white font-extrabold rounded-xl shadow-lg shadow-blue-600/30 transition transform hover:-translate-y-0.5 text-sm">
+              ⚡ Generate Safe Layover Plan
+            </button>
+            
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="window.canIVisitUI.openModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs border border-slate-700 transition">
+                🔍 "Can I Visit This?" Checker
+              </button>
+              <button type="button" onclick="window.emergencyUI.openEmergencyModal()" class="px-4 py-2.5 bg-red-600/90 hover:bg-red-600 text-white font-bold rounded-xl text-xs shadow-md shadow-red-600/30 transition flex items-center gap-1.5">
+                <span>🚨</span> I'M RUNNING LATE
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- ================= SMART LAYOVER CALCULATOR BREAKDOWN ================= -->
+      <div id="calculatorBreakdownContainer">
+        <!-- Rendered by calculatorUI.js -->
+      </div>
+
+      <!-- Weather Adaptation Banner -->
+      <div id="weatherNoticeContainer"></div>
+
+      <!-- Risk Score Meter -->
+      <div id="riskScoreContainer">
+        <!-- Rendered by itineraryUI.js -->
+      </div>
+
+      <!-- ================= MAIN TWO-COLUMN DASHBOARD ================= -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left Column: Minute-by-Minute Itinerary Timeline (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+            <div>
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <span>⏱️</span> Flight-Safe Itinerary Timeline
+              </h3>
+              <p class="text-xs text-slate-400">Strictly synchronized with your flight departure deadline</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <button onclick="window.app.saveCurrentTrip()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center gap-1">
+                💾 Save Trip
+              </button>
+              <button onclick="window.offlineExportManager.printBoardingPass()" class="px-3 py-1.5 bg-blue-600/80 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition flex items-center gap-1">
+                🖨️ Print / PDF
+              </button>
+            </div>
+          </div>
+
+          <div id="itineraryTimelineContainer">
+            <!-- Timeline items rendered by itineraryUI.js -->
+          </div>
+        </div>
+
+        <!-- Right Column: Interactive Map, Simulation, Budget, Emergency (5 cols) -->
+        <div class="lg:col-span-5 space-y-5">
+          
+          <!-- Leaflet Interactive Map -->
+          <div class="glass-card p-4 border-slate-700/80">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>🗺️</span> Transit Route & Safety Perimeter
+              </h4>
+              <span class="text-[11px] text-blue-400 font-semibold">Live GIS Geometry</span>
+            </div>
+            <div id="mapContainer"></div>
+          </div>
+
+          <!-- Weather & Climate Card -->
+          <div id="weatherCardContainer">
+            <!-- Rendered by budgetWeatherUI.js -->
+          </div>
+
+          <!-- Budget Breakdown Card -->
+          <div id="budgetBreakdownContainer">
+            <!-- Rendered by budgetWeatherUI.js -->
+          </div>
+
+          <!-- "What If?" Dynamic Simulator Widget -->
+          <div class="glass-card p-5 border-slate-700/80">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
+                <span>🎛️</span> "What If?" Dynamic Simulator
+              </h4>
+              <span class="px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded text-[10px] font-bold uppercase">Real-Time</span>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">Perturb your schedule and watch LayoverIQ recalculate safety buffers and risk in real-time.</p>
+
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-xs font-semibold text-slate-300 mb-1">
+                  <span>Spend Extra Time at Sight:</span>
+                  <span id="simExtraDurationValue" class="text-blue-400 font-bold">+0 mins</span>
+                </div>
+                <input type="range" id="simExtraDurationSlider" min="-30" max="120" step="15" value="0"
+                  oninput="document.getElementById('simExtraDurationValue').innerText = (this.value >= 0 ? '+' : '') + this.value + ' mins'; window.simulatorUI.runSimulation();"
+                  class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-400 mb-1">Switch Transport:</label>
+                  <select id="simTransportSelect" onchange="window.simulatorUI.runSimulation()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
+                    <option value="metro">🚇 Metro Train</option>
+                    <option value="taxi">🚕 Express Taxi</option>
+                    <option value="bus">🚌 Public Bus</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-400 mb-1">City Departure Offset:</label>
+                  <select id="simDepartureOffsetSlider" onchange="window.simulatorUI.runSimulation()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
+                    <option value="0">On Schedule</option>
+                    <option value="20">+20 min later</option>
+                    <option value="40">+40 min later</option>
+                    <option value="-20">20 min earlier</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simulation Results Injection -->
+            <div id="simulatorResultsContainer" class="mt-4"></div>
+          </div>
+
+          <!-- Offline Export & Emergency Quick Actions Card -->
+          <div class="glass-card p-4 border-slate-700/80 flex items-center justify-between gap-3">
+            <div>
+              <h5 class="text-xs font-bold text-white">Offline Access & Downloads</h5>
+              <p class="text-[11px] text-slate-400">Boarding-pass PDF & JSON sync</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="window.offlineExportManager.downloadJSON()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition">
+                📥 JSON
+              </button>
+              <button onclick="window.offlineExportManager.printBoardingPass()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow transition">
+                🎫 Boarding Pass
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: "I'M NEW HERE" MODE ================= -->
+    <section id="tabPane_newHereTab" class="hidden space-y-6">
+      <div class="glass-card p-6 border-slate-700/80">
+        <div class="max-w-2xl mx-auto text-center space-y-3 mb-6">
+          <span class="text-3xl">🔰</span>
+          <h3 class="text-2xl font-black text-white">"I'm New Here" — Beginner Layover Guide</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            First time in this transit hub? We eliminate decision fatigue and automatically curate the safest, highest-rated itinerary with zero stress.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="p-4 bg-slate-900/80 border border-slate-700 rounded-xl">
+            <span class="text-xl">🌟</span>
+            <h4 class="font-bold text-white text-sm mt-1">1. Iconic Highlights Only</h4>
+            <p class="text-xs text-slate-400 mt-1">We filter out niche sights and prioritize the #1 must-see landmarks nearest to your airport.</p>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-700 rounded-xl">
+            <span class="text-xl">🛡️</span>
+            <h4 class="font-bold text-white text-sm mt-1">2. Extended Safety Cushion</h4>
+            <p class="text-xs text-slate-400 mt-1">Extra 30-minute buffer added to navigate terminal transfers and avoid getting lost.</p>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-700 rounded-xl">
+            <span class="text-xl">💡</span>
+            <h4 class="font-bold text-white text-sm mt-1">3. Transparent "Why" Rationale</h4>
+            <p class="text-xs text-slate-400 mt-1">Every recommended stop explains exactly why it was chosen based on distance and deadlines.</p>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <button onclick="window.app.switchTab('optimizerTab'); window.calculatorUI.loadPreset('dubai_demo');" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-500 text-white font-extrabold rounded-xl shadow-lg transition">
+            ✨ Launch Curated Beginner Itinerary
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: DEVOPS CI/CD LAB WORKFLOW ================= -->
+    <section id="tabPane_devopsTab" class="hidden space-y-6">
+      <div class="glass-card p-6 border-slate-700/80">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-5">
+          <div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+              <span>🚀</span> DevOps Lab Lifecycle & Branching Architecture
+            </h3>
+            <p class="text-xs text-slate-400">Complete 10-Phase CI/CD Pipeline & GitHub Collaboration Model</p>
+          </div>
+          <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold rounded-lg border border-emerald-500/40">
+            CI: Passing 100%
+          </span>
+        </div>
+
+        <!-- 3 Feature Branches Team Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="p-4 bg-slate-900/80 border border-blue-600/40 rounded-xl">
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-0.5 bg-blue-500/20 text-blue-300 font-mono font-bold text-[11px] rounded">feature/frontend</span>
+              <span class="text-xs text-slate-400">Collaborator 1</span>
+            </div>
+            <h4 class="font-bold text-white text-sm">Frontend Developer</h4>
+            <p class="text-xs text-slate-300 mt-1">Responsive UI, Timeline visualizer, Leaflet maps, What-If simulation sliders, Emergency modal.</p>
+          </div>
+
+          <div class="p-4 bg-slate-900/80 border border-teal-600/40 rounded-xl">
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-0.5 bg-teal-500/20 text-teal-300 font-mono font-bold text-[11px] rounded">feature/backend</span>
+              <span class="text-xs text-slate-400">Collaborator 2</span>
+            </div>
+            <h4 class="font-bold text-white text-sm">Backend Developer</h4>
+            <p class="text-xs text-slate-300 mt-1">Express REST API, Layover Calculator, Risk Scorer, Feasibility Engine, Database models & Jest tests.</p>
+          </div>
+
+          <div class="p-4 bg-slate-900/80 border border-purple-600/40 rounded-xl">
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-0.5 bg-purple-500/20 text-purple-300 font-mono font-bold text-[11px] rounded">feature/devops</span>
+              <span class="text-xs text-slate-400">Collaborator 3</span>
+            </div>
+            <h4 class="font-bold text-white text-sm">DevOps Engineer</h4>
+            <p class="text-xs text-slate-300 mt-1">Jenkinsfile pipeline, Docker containerization, automated testing, quality gates, lifecycle docs.</p>
+          </div>
+        </div>
+
+        <!-- 6-Stage Jenkins Pipeline Visualization -->
+        <div class="p-5 bg-slate-900/90 border border-slate-800 rounded-xl mb-6">
+          <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Jenkins Declarative CI Pipeline (6 Stages)</h4>
+          
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-center text-xs">
+            <div class="p-3 bg-slate-800/80 border border-emerald-500/40 rounded-lg">
+              <div class="text-lg mb-1">📦</div>
+              <p class="font-bold text-white">Stage 1</p>
+              <p class="text-slate-400 text-[10px] mt-0.5">Git Checkout</p>
+              <span class="text-[10px] text-emerald-400 font-bold block mt-1">✓ Success</span>
+            </div>
+            <div class="p-3 bg-slate-800/80 border border-emerald-500/40 rounded-lg">
+              <div class="text-lg mb-1">📥</div>
+              <p class="font-bold text-white">Stage 2</p>
+              <p class="text-slate-400 text-[10px] mt-0.5">Install Deps</p>
+              <span class="text-[10px] text-emerald-400 font-bold block mt-1">✓ npm ci</span>
+            </div>
+            <div class="p-3 bg-slate-800/80 border border-emerald-500/40 rounded-lg">
+              <div class="text-lg mb-1">🔍</div>
+              <p class="font-bold text-white">Stage 3</p>
+              <p class="text-slate-400 text-[10px] mt-0.5">Build & Lint</p>
+              <span class="text-[10px] text-emerald-400 font-bold block mt-1">✓ Verified</span>
+            </div>
+            <div class="p-3 bg-slate-800/80 border border-emerald-500/40 rounded-lg">
+              <div class="text-lg mb-1">🧪</div>
+              <p class="font-bold text-white">Stage 4</p>
+              <p class="text-slate-400 text-[10px] mt-0.5">Jest Tests</p>
+              <span class="text-[10px] text-emerald-400 font-bold block mt-1">✓ 17/17 Passed</span>
+            </div>
+            <div class="p-3 bg-slate-800/80 border border-emerald-500/40 rounded-lg">
+              <div class="text-lg mb-1">🛡️</div>
+              <p class="font-bold text-white">Stage 5</p>
+              <p class="text-slate-400 text-[10px] mt-0.5">Quality Gate</p>
+              <span class="text-[10px] text-emerald-400 font-bold block mt-1">✓ 0 Vulnerabilities</span>
+            </div>
+            <div class="p-3 bg-slate-800/80 border border-emerald-500/40 rounded-lg">
+              <div class="text-lg mb-1">🚀</div>
+              <p class="font-bold text-white">Stage 6</p>
+              <p class="text-slate-400 text-[10px] mt-0.5">Staging Deploy</p>
+              <span class="text-[10px] text-emerald-400 font-bold block mt-1">✓ Live</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-xs text-slate-300">
+          <p>For complete documentation, see <strong class="text-white">docs/devops-lifecycle.md</strong>, <strong class="text-white">docs/architecture.md</strong>, and <strong class="text-white">docs/api.md</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= FLOATING AI TRAVEL ASSISTANT DRAWER ================= -->
+  <div id="aiAssistantFloating" class="fixed bottom-6 right-6 z-50">
+    
+    <!-- Floating Trigger Bubble -->
+    <button onclick="window.aiChatUI.toggleChat()" class="relative w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 to-teal-400 text-white flex items-center justify-center text-2xl shadow-2xl hover:scale-105 transition transform">
+      🤖
+      <span id="aiNotificationDot" class="absolute top-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-slate-900"></span>
+    </button>
+
+    <!-- Chat Drawer Container -->
+    <div id="aiChatDrawer" class="hidden absolute bottom-16 right-0 w-[92vw] sm:w-[380px] h-[520px] glass-card border-slate-700/80 shadow-2xl flex flex-col overflow-hidden animate-fade-in">
+      
+      <!-- Drawer Header -->
+      <div class="p-3.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🤖</span>
+          <div>
+            <h4 class="text-xs font-bold text-white">LayoverIQ AI Assistant</h4>
+            <p class="text-[10px] text-emerald-400 font-medium">● Online • Flight-Safety Intelligence</p>
+          </div>
+        </div>
+        <button onclick="window.aiChatUI.toggleChat()" class="text-slate-400 hover:text-white text-base">✕</button>
+      </div>
+
+      <!-- Quick Suggestion Chips -->
+      <div class="p-2.5 bg-slate-950 border-b border-slate-800/80 flex gap-1.5 overflow-x-auto text-[10px]">
+        <button onclick="window.aiChatUI.sendMessage('I have 5 hours in Dubai and love food')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded whitespace-nowrap border border-slate-700">
+          🍜 5h in Dubai?
+        </button>
+        <button onclick="window.aiChatUI.sendMessage('Can I visit Burj Khalifa?')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded whitespace-nowrap border border-slate-700">
+          🏛️ Burj Khalifa?
+        </button>
+        <button onclick="window.aiChatUI.sendMessage('I am running 25 minutes late')" class="px-2.5 py-1 bg-red-950 text-red-300 rounded whitespace-nowrap border border-red-700">
+          🚨 25m Late
+        </button>
+      </div>
+
+      <!-- Message History Container -->
+      <div id="aiChatMessages" class="flex-1 p-3.5 space-y-3 overflow-y-auto bg-slate-950/60">
+        <!-- Messages rendered by aiChatUI.js -->
+      </div>
+
+      <!-- Input Bar -->
+      <div class="p-2.5 bg-slate-900 border-t border-slate-800 flex gap-2">
+        <input type="text" id="aiChatInput" placeholder="Ask about layovers, delays, sights..."
+          onkeypress="if(event.key === 'Enter') window.aiChatUI.sendMessage()"
+          class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" />
+        <button onclick="window.aiChatUI.sendMessage()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition">
+          Send
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. "Can I Visit This?" Modal -->
+  <div id="canIVisitModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full p-6 border-slate-700 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="window.canIVisitUI.closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
+      
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-2xl">🔍</span>
+        <h3 class="text-lg font-bold text-white">"Can I Actually Visit This?"</h3>
+      </div>
+      <p class="text-xs text-slate-400 mb-4">Evaluate whether a specific attraction safely fits into your remaining layover time.</p>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Select Attraction</label>
+          <select id="canIVisitAttractionSelect" onchange="window.canIVisitUI.evaluateCurrentSelection()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Transport Mode</label>
+          <select id="canIVisitTransportSelect" onchange="window.canIVisitUI.evaluateCurrentSelection()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+            <option value="metro">🚇 Public Metro</option>
+            <option value="taxi">🚕 Express Taxi</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="canIVisitResultContainer"></div>
+    </div>
+  </div>
+
+  <!-- 2. "🚨 I'M RUNNING LATE" Emergency Modal -->
+  <div id="emergencyModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+    <div class="glass-card max-w-xl w-full p-6 border-red-500/80 shadow-2xl relative max-h-[90vh] overflow-y-auto bg-slate-950">
+      <button onclick="window.emergencyUI.closeEmergencyModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
+      
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-2xl">🚨</span>
+        <h3 class="text-lg font-black text-red-400">"I'M RUNNING LATE" Emergency Protocol</h3>
+      </div>
+      <p class="text-xs text-slate-400 mb-4">Instantly trims stops, switches to fastest express taxi, and computes your absolute latest departure deadline.</p>
+
+      <div class="mb-4">
+        <div class="flex justify-between text-xs font-bold text-slate-300 mb-1">
+          <span>How many minutes behind schedule are you?</span>
+          <span id="emergencyDelayValue" class="text-red-400 font-extrabold">35 mins</span>
+        </div>
+        <input type="range" id="emergencyDelaySlider" min="15" max="90" step="5" value="35"
+          oninput="document.getElementById('emergencyDelayValue').innerText = this.value + ' mins'; window.emergencyUI.triggerEmergencyReroute();"
+          class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-red-500" />
+      </div>
+
+      <div id="emergencyResultsContainer"></div>
+    </div>
+  </div>
+
+  <!-- 3. Authentication Modal -->
+  <div id="authModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full border-slate-700 shadow-2xl relative bg-slate-950 overflow-hidden">
+      <button onclick="window.authManager.closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
+      <div id="authModalBody"></div>
+    </div>
+  </div>
+
+  <!-- 4. Saved Trips Drawer Modal -->
+  <div id="savedTripsModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full p-6 border-slate-700 shadow-2xl relative max-h-[85vh] overflow-y-auto bg-slate-950">
+      <button onclick="window.app.closeSavedTripsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">✕</button>
+      
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-xl">📇</span>
+        <h3 class="text-lg font-bold text-white">Your Saved Layover Trips</h3>
+      </div>
+      <p class="text-xs text-slate-400 mb-4">View or reload previously planned flight layovers.</p>
+
+      <div id="savedTripsList" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="notificationToast" class="fixed bottom-5 left-5 z-50 opacity-0 pointer-events-none transition-all duration-300"></div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="mt-12 border-t border-slate-800/80 bg-slate-950 py-8 px-4 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div>
+        <p class="font-bold text-slate-300 text-sm">Layover<span class="text-blue-400">IQ</span> — "Smart decisions between flights."</p>
+        <p class="mt-1">DevOps Lab Full-Stack Project • Automated CI/CD Pipeline with Jenkins & Git</p>
+      </div>
+
+      <div class="flex flex-wrap gap-4 text-[11px]">
+        <span class="text-blue-400 font-mono font-bold">git: feature/frontend</span>
+        <span class="text-teal-400 font-mono font-bold">git: feature/backend</span>
+        <span class="text-purple-400 font-mono font-bold">git: feature/devops</span>
+        <span class="text-emerald-400 font-mono font-bold">git: main (Merged)</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Frontend Scripts (Loaded in dependency order) -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/calculatorUI.js"></script>
+  <script src="js/itineraryUI.js"></script>
+  <script src="js/simulatorUI.js"></script>
+  <script src="js/canIVisitUI.js"></script>
+  <script src="js/emergencyUI.js"></script>
+  <script src="js/mapUI.js"></script>
+  <script src="js/aiChatUI.js"></script>
+  <script src="js/budgetWeatherUI.js"></script>
+  <script src="js/offlineExport.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

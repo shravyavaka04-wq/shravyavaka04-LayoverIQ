@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  layoveriq-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: layoveriq-web
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - JWT_SECRET=layoveriq_docker_compose_super_secret_key_2026
+      - MONGODB_URI=mongodb://mongo:27017/layoveriq
+    depends_on:
+      - mongo
+    networks:
+      - layoveriq-net
+
+  mongo:
+    image: mongo:6.0
+    container_name: layoveriq-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - layoveriq-net
+
+volumes:
+  mongo-data:
+    driver: local
+
+networks:
+  layoveriq-net:
+    driver: bridge

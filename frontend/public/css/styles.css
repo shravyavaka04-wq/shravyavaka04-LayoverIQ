@@ -1,0 +1,209 @@
+/* ==============================================================================
+   LayoverIQ — Master Stylesheet
+   "Smart decisions between flights."
+   ============================================================================== */
+
+:root {
+  --primary-navy: #0B132B;
+  --secondary-navy: #1C2541;
+  --accent-cyan: #3A86FF;
+  --accent-teal: #00F5D4;
+  --accent-gold: #FFB703;
+  --accent-danger: #EF476F;
+  --risk-safe: #10B981;
+  --risk-medium: #F59E0B;
+  --risk-danger: #EF4444;
+  --bg-dark: #0A0F1D;
+  --card-bg: rgba(28, 37, 65, 0.7);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Card Utility */
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s ease-in-out;
+}
+
+.glass-card:hover {
+  border-color: rgba(58, 134, 255, 0.3);
+}
+
+.glass-nav {
+  background: rgba(11, 19, 43, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Hero Flight Gradient Glow */
+.hero-glow {
+  background: radial-gradient(circle at 50% 20%, rgba(58, 134, 255, 0.18) 0%, rgba(0, 245, 212, 0.05) 45%, transparent 70%);
+}
+
+/* Timeline Custom Styles */
+.timeline-track {
+  position: relative;
+}
+
+.timeline-track::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  bottom: 15px;
+  left: 28px;
+  width: 3px;
+  background: linear-gradient(180deg, #3A86FF 0%, #00F5D4 50%, #FFB703 80%, #EF4444 100%);
+  border-radius: 4px;
+}
+
+.timeline-node {
+  position: relative;
+  padding-left: 65px;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 17px;
+  top: 18px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: var(--secondary-navy);
+  border: 3px solid #3A86FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 0 12px rgba(58, 134, 255, 0.5);
+  transition: transform 0.2s;
+}
+
+.timeline-node:hover .timeline-dot {
+  transform: scale(1.2);
+}
+
+.timeline-dot.danger {
+  border-color: var(--risk-danger);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.7);
+  animation: pulse-danger 2s infinite;
+}
+
+.timeline-dot.safe {
+  border-color: var(--risk-safe);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+}
+
+.timeline-dot.buffer {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 12px rgba(255, 183, 3, 0.5);
+}
+
+@keyframes pulse-danger {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* Risk Meter Gauge */
+.risk-meter-ring {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* Running Late Emergency Pulsing Banner */
+.emergency-pulse {
+  background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%);
+  animation: emergency-glow 1.8s infinite alternate;
+}
+
+@keyframes emergency-glow {
+  0% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+  100% { box-shadow: 0 0 40px rgba(239, 68, 68, 0.9); }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B132B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1C2541;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A86FF;
+}
+
+/* Interactive Map Styling */
+#mapContainer {
+  height: 380px;
+  border-radius: 16px;
+  z-index: 1;
+}
+
+/* Modals */
+.modal-backdrop {
+  background: rgba(10, 15, 29, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+/* Print / Boarding Pass Offline Export */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  nav, footer, .no-print, #aiAssistantFloating, #mapContainer {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .glass-card {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    break-inside: avoid;
+  }
+
+  .text-white, .text-slate-200, .text-slate-300 {
+    color: #000000 !important;
+  }
+
+  .text-slate-400 {
+    color: #555555 !important;
+  }
+}
