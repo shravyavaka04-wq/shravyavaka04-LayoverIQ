@@ -1,7 +1,6 @@
-# ✈️ LayoverIQ — Intelligent Layover Travel Manager
+# ✈️ LayoverIQ — Intelligent Layover Travel & Transit Manager
 > **"Smart decisions between flights."**
 
-[![CI Status](https://img.shields.io/badge/Jenkins%20CI-Passing%20100%25-brightgreen)](https://jenkins.io)
 [![Tests](https://img.shields.io/badge/Tests-17%20Passed-success)](https://jestjs.io)
 [![Node Version](https://img.shields.io/badge/Node-v20%2B-blue)](https://nodejs.org)
 [![License](https://img.shields.io/badge/License-MIT-purple)](LICENSE)
@@ -43,45 +42,14 @@ LayoverIQ calculates realistic usable exploration time and generates a flight-sa
 * **Backend**: Node.js, Express.js REST API.
 * **Database**: Dual-Mode (MongoDB with Mongoose + Zero-Config In-Memory / Local Repository Fallback).
 * **Testing Framework**: Jest & Supertest (17 automated unit and integration tests).
-* **CI/CD & DevOps**: Git, GitHub, Jenkins Declarative Pipeline, Docker, Docker Compose.
 
 ---
 
-## 4. DevOps Lab Workflow & Git Collaboration Structure
-
-LayoverIQ was built specifically for the **DevOps Lab**, demonstrating an enterprise collaborative development lifecycle:
-
-$$\text{Git} \longrightarrow \text{GitHub} \longrightarrow \text{Feature Branch} \longrightarrow \text{Pull Request} \longrightarrow \text{Code Review} \longrightarrow \text{Merge} \longrightarrow \text{Jenkins CI} \longrightarrow \text{Automated Test} \longrightarrow \text{Deployment}$$
-
-### The 3 Collaborator Feature Branches:
-
-| Collaborator | Feature Branch | Core Responsibilities |
-| :--- | :--- | :--- |
-| **Collaborator 1** | `feature/frontend` | Responsive UI, Dashboard, Timeline visualizer, Leaflet maps, What-If sliders, Emergency modal. |
-| **Collaborator 2** | `feature/backend` | Express REST API, Layover calculation logic, Risk Scorer, Feasibility engine, Database models & Jest tests. |
-| **Collaborator 3** | `feature/devops` | Jenkinsfile, Docker containerization, CI/CD stages, automated testing, quality gates, lifecycle documentation. |
-
----
-
-## 5. Jenkins 6-Stage CI/CD Pipeline
-
-The project includes a production-grade `Jenkinsfile` executing:
-
-1. **Stage 1: Checkout Source Code** (Fetches latest commit from Git repository)
-2. **Stage 2: Install Dependencies** (`npm ci` / `npm install`)
-3. **Stage 3: Build & Lint Application** (Verifies syntax and packaging integrity)
-4. **Stage 4: Automated Testing** (Runs Jest test suites with coverage report)
-5. **Stage 5: Quality Gate & Security Check** (Validates 100% test pass rate and 0 high vulnerabilities)
-6. **Stage 6: Deploy Application** (Launches containerized service on port 5000)
-
----
-
-## 6. Installation & Quickstart
+## 4. Installation & Quickstart
 
 ### Prerequisites
 * Node.js (v18 or higher)
 * npm (v9 or higher)
-* Git
 
 ### Step-by-Step Setup:
 
@@ -116,20 +84,9 @@ The project includes a production-grade `Jenkinsfile` executing:
 
 ---
 
-## 7. Running with Docker & Docker Compose
+## 5. Demo Presentation Scenarios
 
-To run the full multi-container stack (LayoverIQ App + MongoDB):
-
-```bash
-docker-compose up -d --build
-```
-Access the application at `http://localhost:5000`.
-
----
-
-## 8. Demo Presentation Scenarios
-
-For live evaluations and presentations, test the following pre-configured scenarios:
+For live evaluations and demonstrations, test the following pre-configured scenarios:
 
 * **Scenario 1: Dubai International (DXB)**
   * Arrival: 10:00 AM | Departure: 6:30 PM (8.5h layover)
@@ -142,6 +99,6 @@ For live evaluations and presentations, test the following pre-configured scenar
 
 ---
 
-## 9. License
+## 6. License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

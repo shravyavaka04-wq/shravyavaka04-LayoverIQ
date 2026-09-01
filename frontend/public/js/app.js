@@ -191,7 +191,7 @@ class LayoverIQApp {
     this.activeTab = tabName;
 
     // Tab buttons styling
-    const tabs = ['optimizerTab', 'newHereTab', 'devopsTab'];
+    const tabs = ['optimizerTab', 'newHereTab'];
     tabs.forEach(t => {
       const btn = document.getElementById(`tabBtn_${t}`);
       const pane = document.getElementById(`tabPane_${t}`);
