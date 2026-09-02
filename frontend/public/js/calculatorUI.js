@@ -1,5 +1,5 @@
 /**
- * Layover Form and Calculator Visualizer
+ * Layover Form and Calculator Visualizer (Modern Light Theme)
  */
 
 class CalculatorUI {
@@ -100,10 +100,10 @@ class CalculatorUI {
     const noticeEl = document.getElementById('airportTransitNotice');
     if (noticeEl && airport) {
       noticeEl.innerHTML = `
-        <div class="p-3 bg-blue-950/40 border border-blue-800/40 rounded-lg text-xs text-blue-200 flex items-start gap-2">
+        <div class="p-3.5 bg-blue-50/80 border border-blue-200 rounded-xl text-xs text-blue-900 flex items-start gap-2.5">
           <span class="text-base">🛂</span>
           <div>
-            <span class="font-bold text-white">${airport.city} Transit Info:</span> ${airport.visaTransitNotice || 'Check transit visa eligibility before passing border control.'}
+            <span class="font-bold text-blue-950">${airport.city} Transit Info:</span> ${airport.visaTransitNotice || 'Check transit visa eligibility before passing border control.'}
           </div>
         </div>
       `;
@@ -114,12 +114,16 @@ class CalculatorUI {
     const btn = document.getElementById(`interest_${interestName}`);
     if (this.selectedInterests.has(interestName)) {
       this.selectedInterests.delete(interestName);
-      if (btn) btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-500');
-      if (btn) btn.classList.add('bg-slate-800/80', 'text-slate-300', 'border-slate-700');
+      if (btn) {
+        btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600', 'shadow-sm');
+        btn.classList.add('bg-slate-100', 'text-slate-700', 'border-slate-200');
+      }
     } else {
       this.selectedInterests.add(interestName);
-      if (btn) btn.classList.add('bg-blue-600', 'text-white', 'border-blue-500');
-      if (btn) btn.classList.remove('bg-slate-800/80', 'text-slate-300', 'border-slate-700');
+      if (btn) {
+        btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600', 'shadow-sm');
+        btn.classList.remove('bg-slate-100', 'text-slate-700', 'border-slate-200');
+      }
     }
   }
 
@@ -183,11 +187,11 @@ class CalculatorUI {
       const btn = document.getElementById(`interest_${name}`);
       if (btn) {
         if (this.selectedInterests.has(name)) {
-          btn.classList.add('bg-blue-600', 'text-white', 'border-blue-500');
-          btn.classList.remove('bg-slate-800/80', 'text-slate-300', 'border-slate-700');
+          btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600', 'shadow-sm');
+          btn.classList.remove('bg-slate-100', 'text-slate-700', 'border-slate-200');
         } else {
-          btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-500');
-          btn.classList.add('bg-slate-800/80', 'text-slate-300', 'border-slate-700');
+          btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600', 'shadow-sm');
+          btn.classList.add('bg-slate-100', 'text-slate-700', 'border-slate-200');
         }
       }
     });
@@ -203,54 +207,54 @@ class CalculatorUI {
     container.innerHTML = `
       <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
         <!-- Total Layover -->
-        <div class="glass-card p-3.5 border-slate-700/60 bg-slate-900/60 text-center">
-          <p class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Total Layover</p>
-          <p class="text-xl font-bold text-white mt-1">${formatted.totalLayover}</p>
-          <span class="text-[10px] text-slate-500">${calcData.formatted.arrivalTimeFormatted} → ${calcData.formatted.departureTimeFormatted}</span>
+        <div class="glass-card p-3.5 border-slate-200 bg-white text-center">
+          <p class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Total Layover</p>
+          <p class="text-xl font-black text-slate-900 mt-1">${formatted.totalLayover}</p>
+          <span class="text-[10px] text-slate-500 font-medium">${calcData.formatted.arrivalTimeFormatted} → ${calcData.formatted.departureTimeFormatted}</span>
         </div>
 
         <!-- Airport Processing -->
-        <div class="glass-card p-3.5 border-slate-700/60 bg-slate-900/60 text-center">
-          <p class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Airport Processing</p>
-          <p class="text-xl font-bold text-amber-400 mt-1">-${formatted.airportProcessing}</p>
+        <div class="glass-card p-3.5 border-slate-200 bg-white text-center">
+          <p class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Airport Processing</p>
+          <p class="text-xl font-black text-amber-600 mt-1">-${formatted.airportProcessing}</p>
           <span class="text-[10px] text-slate-500">Immigration & Exit</span>
         </div>
 
         <!-- Transportation Time -->
-        <div class="glass-card p-3.5 border-slate-700/60 bg-slate-900/60 text-center">
-          <p class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Transit to City</p>
-          <p class="text-xl font-bold text-blue-400 mt-1">-${formatted.transitTime}</p>
+        <div class="glass-card p-3.5 border-slate-200 bg-white text-center">
+          <p class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Transit to City</p>
+          <p class="text-xl font-black text-blue-600 mt-1">-${formatted.transitTime}</p>
           <span class="text-[10px] text-slate-500">Roundtrip Transit</span>
         </div>
 
         <!-- Recommended Return Buffer -->
-        <div class="glass-card p-3.5 border-slate-700/60 bg-slate-900/60 text-center">
-          <p class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Airport Buffer</p>
-          <p class="text-xl font-bold text-purple-400 mt-1">-${formatted.airportSafetyBuffer}</p>
+        <div class="glass-card p-3.5 border-slate-200 bg-white text-center">
+          <p class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Airport Buffer</p>
+          <p class="text-xl font-black text-purple-600 mt-1">-${formatted.airportSafetyBuffer}</p>
           <span class="text-[10px] text-slate-500">Security & Gate</span>
         </div>
 
         <!-- Actual Usable Exploration Time -->
-        <div class="glass-card p-3.5 border-2 ${isViableForCityExploration ? 'border-emerald-500/50 bg-emerald-950/30' : 'border-red-500/50 bg-red-950/30'} col-span-2 md:col-span-1 text-center shadow-lg">
-          <p class="text-[11px] ${isViableForCityExploration ? 'text-emerald-300' : 'text-red-300'} font-bold uppercase tracking-wider">Usable Exploration</p>
-          <p class="text-2xl font-extrabold ${isViableForCityExploration ? 'text-emerald-400' : 'text-red-400'} mt-1">${formatted.actualExplorationTime}</p>
-          <span class="text-[10px] ${isViableForCityExploration ? 'text-emerald-200/70' : 'text-red-200/70'}">City Exploration Window</span>
+        <div class="glass-card p-3.5 border-2 ${isViableForCityExploration ? 'border-emerald-500 bg-emerald-50/50' : 'border-red-500 bg-red-50/50'} col-span-2 md:col-span-1 text-center shadow-md">
+          <p class="text-[11px] ${isViableForCityExploration ? 'text-emerald-800' : 'text-red-800'} font-bold uppercase tracking-wider">Usable Exploration</p>
+          <p class="text-2xl font-black ${isViableForCityExploration ? 'text-emerald-600' : 'text-red-600'} mt-1">${formatted.actualExplorationTime}</p>
+          <span class="text-[10px] ${isViableForCityExploration ? 'text-emerald-700' : 'text-red-700'} font-medium">City Exploration Window</span>
         </div>
       </div>
 
       <!-- Critical Deadlines Ribbon -->
-      <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-slate-900/80 border border-slate-700/70 rounded-xl text-xs">
+      <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-white border border-slate-200 rounded-xl text-xs shadow-sm">
         <div class="flex items-center gap-2">
-          <span class="text-blue-400 font-bold">🏙️ City Arrival:</span>
-          <span class="text-white font-semibold">${calcData.formatted.arrivalTimeFormatted} + ${calcData.breakdownMinutes.totalAirportProcessingMinutes + calcData.breakdownMinutes.travelToCityMinutes}m</span>
+          <span class="text-blue-600 font-bold">🏙️ City Arrival:</span>
+          <span class="text-slate-800 font-semibold">${calcData.formatted.arrivalTimeFormatted} + ${calcData.breakdownMinutes.totalAirportProcessingMinutes + calcData.breakdownMinutes.travelToCityMinutes}m</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-amber-400 font-bold">🚨 MUST Leave City by:</span>
-          <span class="px-2 py-0.5 bg-amber-500/20 text-amber-300 font-bold rounded border border-amber-500/40">${formatted.latestCityDepartureFormatted}</span>
+          <span class="text-amber-700 font-bold">🚨 MUST Leave City by:</span>
+          <span class="px-2.5 py-0.5 bg-amber-100 text-amber-900 font-bold rounded border border-amber-300">${formatted.latestCityDepartureFormatted}</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-emerald-400 font-bold">✈️ Return to Airport:</span>
-          <span class="text-white font-semibold">${formatted.recommendedReturnFormatted}</span>
+          <span class="text-emerald-700 font-bold">✈️ Return to Airport:</span>
+          <span class="text-slate-900 font-bold">${formatted.recommendedReturnFormatted}</span>
         </div>
       </div>
     `;
