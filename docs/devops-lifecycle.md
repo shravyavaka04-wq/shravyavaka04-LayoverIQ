@@ -182,3 +182,4 @@ To set up the Jenkins Pipeline job:
    - Branch Specifier: `*/main`
    - Script Path: `Jenkinsfile`
 4. Click **Save** and trigger **Build Now**.
+# Jenkins pipeline verified
