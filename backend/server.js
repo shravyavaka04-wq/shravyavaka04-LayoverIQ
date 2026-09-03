@@ -24,7 +24,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static frontend assets
-app.use(express.static(path.join(__dirname, '../frontend/public')));
+app.use(express.static(path.join(__dirname, '..')));
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -49,7 +49,7 @@ app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found.` });
   }
-  res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
+  res.sendFile(path.join(__dirname, '../index.html'));
 });
 
 // Centralized Error Handling
