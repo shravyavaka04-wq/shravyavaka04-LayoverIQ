@@ -3,7 +3,8 @@
  * "Smart decisions between flights."
  */
 
-const API_BASE = '/api';
+
+const API_BASE = 'https://shravyavaka04-layoveriq.onrender.com/api';
 
 class LayoverAPI {
   static getAuthHeaders() {
